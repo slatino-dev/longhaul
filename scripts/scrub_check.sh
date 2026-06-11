@@ -26,6 +26,8 @@ for pattern in "${PATTERNS[@]}"; do
     fi
 
     while IFS= read -r file; do
+        # The pattern list above would match itself — skip this script.
+        [ "$file" = "scripts/scrub_check.sh" ] && continue
         abs="$REPO_ROOT/$file"
         [ -f "$abs" ] || continue
         matches=$(grep -nEo "$pattern" "$abs" 2>/dev/null || true)
