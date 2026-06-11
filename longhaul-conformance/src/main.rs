@@ -43,13 +43,13 @@ async fn main() {
             eprintln!("  longhaul-conformance --url http://localhost:3000 --filter tasks");
             eprintln!("  longhaul-conformance --url http://localhost:3000 --json");
             eprintln!();
-            eprintln!("Suites (Phase A stubs — implementation coming in Phase B):");
-            eprintln!("  lifecycle      initialize / initialized handshake");
+            eprintln!("Suites (stubs — runner implementation coming in a later phase):");
+            eprintln!("  discovery      server/discover capability discovery");
             eprintln!("  resources      list, read, subscribe");
-            eprintln!("  tools          list, call, annotations");
+            eprintln!("  tools          list (cache metadata), call, outcomes");
             eprintln!("  prompts        list, get");
             eprintln!("  sampling       createMessage round-trip");
-            eprintln!("  tasks          create/get/update/cancel/list (Tasks extension)");
+            eprintln!("  tasks          get/update/cancel + task-handle calls (Tasks extension)");
             eprintln!();
             std::process::exit(1);
         }

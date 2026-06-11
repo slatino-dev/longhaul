@@ -21,7 +21,9 @@ pub mod middleware {}
 pub mod config {}
 
 /// Tasks extension HTTP handlers (experimental).
-/// TODO: implement `tasks/create`, `tasks/get`, `tasks/update`, `tasks/cancel`, `tasks/list`.
+/// TODO: implement `tasks/get`, `tasks/update`, `tasks/cancel` over
+/// `longhaul_core::tasks` (NOTE: `tasks/list` was removed in the 2026-07-28
+/// RC — do not add it).
 pub mod tasks {}
 
 /// Health and readiness endpoints (`/health`, `/ready`).
