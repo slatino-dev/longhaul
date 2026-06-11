@@ -22,6 +22,11 @@
 //!   `-32002` → `-32602` invalid-params consolidation.
 //! * [`discover`] — `server/discover` capability discovery (the RC removed
 //!   the `initialize` handshake).
+//! * [`tools`] — `tools/list` (with `ttlMs` / `cacheScope` cache metadata)
+//!   and `tools/call`; schemas are JSON Schema 2020-12 carried untyped as
+//!   [`serde_json::Value`] with depth-bounded validation; the
+//!   [`tools::ToolCallOutcome`] union covers content / task-handle /
+//!   input-required results.
 //! * [`tasks`] — the Tasks extension: task object + lifecycle state
 //!   machine, `tasks/get` / `tasks/update` / `tasks/cancel`
 //!   (`tasks/list` was removed by the RC), task-handle and
@@ -41,5 +46,6 @@ pub mod http;
 pub mod jsonrpc;
 pub mod meta;
 pub mod tasks;
+pub mod tools;
 
 mod tag;
