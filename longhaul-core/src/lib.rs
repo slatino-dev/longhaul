@@ -20,6 +20,12 @@
 //!   `Mcp-Method`, `Mcp-Name`).
 //! * [`error`] — JSON-RPC error object + code constants, including the RC's
 //!   `-32002` → `-32602` invalid-params consolidation.
+//! * [`discover`] — `server/discover` capability discovery (the RC removed
+//!   the `initialize` handshake).
+//! * [`tasks`] — the Tasks extension: task object + lifecycle state
+//!   machine, `tasks/get` / `tasks/update` / `tasks/cancel`
+//!   (`tasks/list` was removed by the RC), task-handle and
+//!   input-required `tools/call` outcomes.
 //!
 //! ## Deliberately out of scope (this crate version)
 //!
@@ -29,9 +35,11 @@
 
 #![warn(missing_docs)]
 
+pub mod discover;
 pub mod error;
 pub mod http;
 pub mod jsonrpc;
 pub mod meta;
+pub mod tasks;
 
 mod tag;
