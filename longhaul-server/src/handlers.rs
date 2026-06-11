@@ -21,7 +21,7 @@ use longhaul_core::{
 };
 
 use crate::{
-    registry::{err_content, ToolError},
+    registry::ToolError,
     store::StoreError,
     ServerState,
 };
@@ -89,14 +89,12 @@ async fn handle_tools_call(state: &ServerState, req: Request) -> DispatchResult 
             params.request_state,
         )
         .await
-        .unwrap_or_else(|e| match &e {
-            ToolError::InvalidParams(_) => {
-                // Propagate as a protocol error (handled below via map_err).
-                // We use err_content only for internal failures.
-                err_content(e.to_string())
-            }
-            _ => err_content(e.to_string()),
-        });
+        .map_err(|e| match e {
+            // Bad arguments from the client → protocol-level -32602.
+            ToolError::InvalidParams(msg) => (INVALID_PARAMS, msg),
+            // Internal tool failure or store error → -32603.
+            other => (INTERNAL_ERROR, other.to_string()),
+        })?;
 
     let value = serde_json::to_value(&outcome).map_err(|e| (INTERNAL_ERROR, e.to_string()))?;
     Ok(Response::success(req.id, value))

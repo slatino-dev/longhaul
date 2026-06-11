@@ -18,7 +18,7 @@ use axum::{
 
 use crate::{
     handlers::{dispatch, health, ready},
-    middleware::mcp_method_check,
+    middleware::{mcp_method_check, mcp_response_headers},
     ServerState,
 };
 
@@ -29,7 +29,9 @@ pub fn build(state: Arc<ServerState>) -> Router {
         .route("/ready", get(ready))
         .route(
             "/mcp",
-            post(dispatch).layer(middleware::from_fn(mcp_method_check)),
+            post(dispatch)
+                .layer(middleware::from_fn(mcp_response_headers))
+                .layer(middleware::from_fn(mcp_method_check)),
         )
         .with_state(state)
 }

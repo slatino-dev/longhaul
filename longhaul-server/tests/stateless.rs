@@ -352,10 +352,14 @@ async fn stateless_task_lifecycle_across_two_sqlite_instances() {
 // ---------------------------------------------------------------------------
 
 #[tokio::test]
-async fn cancel_race_idempotent() {
+async fn cancel_twice_is_idempotent() {
+    // Issuing tasks/cancel twice on the same task must not error — the second
+    // call sees a terminal state and returns it unchanged. (This mirrors the
+    // idempotent-cancel semantics in the store unit tests; here we exercise the
+    // full HTTP dispatch path.)
     let store = Arc::new(MemoryStore::new());
     store
-        .insert(longhaul_core::tasks::Task::new("race-task"))
+        .insert(longhaul_core::tasks::Task::new("idempotent-cancel-task"))
         .unwrap();
 
     let state = Arc::new(ServerState {
@@ -364,10 +368,14 @@ async fn cancel_race_idempotent() {
         store: store as Arc<dyn TaskStore>,
     });
 
-    // Cancel twice — both should report cancelled (not an error).
     for i in 0..2 {
         let app = router::build(Arc::clone(&state));
-        let resp = post_mcp(app, "tasks/cancel", json!({"taskId": "race-task"})).await;
+        let resp = post_mcp(
+            app,
+            "tasks/cancel",
+            json!({"taskId": "idempotent-cancel-task"}),
+        )
+        .await;
         let r = result_of(&resp);
         assert_eq!(r["status"], "cancelled", "cancel attempt {i}");
     }

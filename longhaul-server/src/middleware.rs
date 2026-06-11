@@ -186,4 +186,21 @@ mod tests {
         let resp = app().oneshot(req).await.unwrap();
         assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
     }
+
+    #[tokio::test]
+    async fn response_headers_layer_sets_mcp_protocol_version() {
+        let app = Router::new()
+            .route("/mcp", post(|| async { "ok" }))
+            .layer(middleware::from_fn(mcp_response_headers))
+            .layer(middleware::from_fn(mcp_method_check));
+
+        let req = build_request(None, Some(PROTOCOL_VERSION), json!({"method":"tools/list"}));
+        let resp = app.oneshot(req).await.unwrap();
+        assert_eq!(resp.status(), StatusCode::OK);
+        let hdr = resp
+            .headers()
+            .get("mcp-protocol-version")
+            .expect("mcp-protocol-version response header must be present");
+        assert_eq!(hdr, PROTOCOL_VERSION);
+    }
 }

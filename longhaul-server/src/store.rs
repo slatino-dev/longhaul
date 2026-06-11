@@ -212,10 +212,25 @@ impl TaskStore for SqliteStore {
                 to: params.status,
             });
         }
-        conn.execute(
-            "UPDATE tasks SET status = ?1 WHERE id = ?2",
-            params![params.status.as_str(), params.task_id],
+        // Guard the write with the status we just read so that a concurrent
+        // write that already moved the task to a terminal state wins and we
+        // return IllegalTransition rather than silently overwriting it.
+        let changed = conn.execute(
+            "UPDATE tasks SET status = ?1 WHERE id = ?2 AND status = ?3",
+            params![
+                params.status.as_str(),
+                params.task_id,
+                task.status.as_str()
+            ],
         )?;
+        if changed == 0 {
+            // Another writer raced us; re-read and report the conflict.
+            let current = Self::read_task(&conn, &params.task_id)?;
+            return Err(StoreError::IllegalTransition {
+                from: current.status,
+                to: params.status,
+            });
+        }
         Ok(Task::new_with_status(params.task_id, params.status))
     }
 
