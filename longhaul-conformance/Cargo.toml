@@ -12,10 +12,18 @@ name = "longhaul-conformance"
 path = "src/main.rs"
 
 [dependencies]
-longhaul-core = { workspace = true }
-tokio         = { workspace = true }
-clap          = { workspace = true }
-reqwest       = { workspace = true }
-jsonschema    = { workspace = true }
-serde         = { workspace = true }
-serde_json    = { workspace = true }
+longhaul-core   = { workspace = true }
+longhaul-server = { path = "../longhaul-server" }
+tokio           = { workspace = true }
+clap            = { workspace = true }
+reqwest         = { workspace = true }
+jsonschema      = { workspace = true }
+serde           = { workspace = true }
+serde_json      = { workspace = true }
+uuid            = { workspace = true }
+
+[dev-dependencies]
+tokio           = { workspace = true }
+axum            = { workspace = true }
+reqwest         = { workspace = true }
+longhaul-server = { path = "../longhaul-server" }

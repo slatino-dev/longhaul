@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mcp-2026-07-28/tools-list-result",
+  "title": "tools/list result",
+  "type": "object",
+  "required": ["tools"],
+  "additionalProperties": true,
+  "properties": {
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "inputSchema"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "inputSchema": {
+            "oneOf": [{ "type": "object" }, { "type": "boolean" }]
+          },
+          "outputSchema": {
+            "oneOf": [{ "type": "object" }, { "type": "boolean" }]
+          }
+        }
+      }
+    },
+    "nextCursor": { "type": "string" },
+    "ttlMs": { "type": "integer", "minimum": 0 },
+    "cacheScope": { "type": "string" }
+  }
+}

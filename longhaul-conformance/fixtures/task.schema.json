@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mcp-2026-07-28/task",
+  "title": "Task object",
+  "description": "A task from the Tasks extension (MCP 2026-07-28 RC).",
+  "type": "object",
+  "required": ["id", "status"],
+  "additionalProperties": true,
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["working", "inputRequired", "completed", "failed", "cancelled"]
+    }
+  }
+}

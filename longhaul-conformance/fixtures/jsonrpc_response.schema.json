@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mcp-2026-07-28/jsonrpc-response",
+  "title": "JSON-RPC 2.0 Response (MCP profile)",
+  "description": "A JSON-RPC 2.0 response. Exactly one of result or error must be present.",
+  "type": "object",
+  "required": ["jsonrpc", "id"],
+  "additionalProperties": true,
+  "properties": {
+    "jsonrpc": {
+      "type": "string",
+      "const": "2.0"
+    },
+    "id": {
+      "oneOf": [
+        { "type": "integer" },
+        { "type": "string" },
+        { "type": "null" }
+      ]
+    },
+    "result": {},
+    "error": {
+      "type": "object",
+      "required": ["code", "message"],
+      "properties": {
+        "code": { "type": "integer" },
+        "message": { "type": "string" }
+      }
+    }
+  }
+}
