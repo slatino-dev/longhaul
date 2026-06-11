@@ -217,11 +217,7 @@ impl TaskStore for SqliteStore {
         // return IllegalTransition rather than silently overwriting it.
         let changed = conn.execute(
             "UPDATE tasks SET status = ?1 WHERE id = ?2 AND status = ?3",
-            params![
-                params.status.as_str(),
-                params.task_id,
-                task.status.as_str()
-            ],
+            params![params.status.as_str(), params.task_id, task.status.as_str()],
         )?;
         if changed == 0 {
             // Another writer raced us; re-read and report the conflict.

@@ -291,7 +291,7 @@ impl IndexDirectoryTool {
                         break;
                     }
                     Ok(t) if t.status.is_terminal() => break, // completed/failed
-                    Err(_) => break,                           // task gone
+                    Err(_) => break,                          // task gone
                     _ => {}
                 }
             }

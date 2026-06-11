@@ -20,11 +20,7 @@ use longhaul_core::{
     tools::{CallToolParams, METHOD_CALL, METHOD_LIST},
 };
 
-use crate::{
-    registry::ToolError,
-    store::StoreError,
-    ServerState,
-};
+use crate::{registry::ToolError, store::StoreError, ServerState};
 
 /// Axum handler for `POST /mcp` — the single stateless dispatch point.
 pub async fn dispatch(
