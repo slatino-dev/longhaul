@@ -1,0 +1,36 @@
+[workspace]
+resolver = "2"
+members = [
+    "longhaul-core",
+    "longhaul-server",
+    "longhaul-conformance",
+    "examples/indexer",
+]
+
+[workspace.package]
+edition    = "2021"
+version    = "0.1.0"
+authors    = ["Sam Latino <Latinosammy2@gmail.com>"]
+license    = "Apache-2.0"
+rust-version = "1.85"
+
+[workspace.dependencies]
+# async runtime
+tokio        = { version = "1", features = ["full"] }
+
+# HTTP server
+axum         = { version = "0.8", features = ["json"] }
+tower        = { version = "0.5" }
+tower-http   = { version = "0.6", features = ["trace"] }
+
+# serialization
+serde        = { version = "1", features = ["derive"] }
+serde_json   = "1"
+
+# CLI / conformance
+clap         = { version = "4", features = ["derive"] }
+reqwest      = { version = "0.12", features = ["json"] }
+jsonschema   = "0.29"
+
+# internal crates
+longhaul-core = { path = "longhaul-core" }

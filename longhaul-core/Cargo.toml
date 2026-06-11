@@ -1,0 +1,12 @@
+[package]
+name        = "longhaul-core"
+description = "MCP 2026-07-28 RC — protocol types and shared primitives"
+edition.workspace   = true
+version.workspace   = true
+authors.workspace   = true
+license.workspace   = true
+rust-version.workspace = true
+
+[dependencies]
+serde      = { workspace = true }
+serde_json = { workspace = true }

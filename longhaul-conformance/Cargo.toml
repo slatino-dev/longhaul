@@ -1,0 +1,21 @@
+[package]
+name        = "longhaul-conformance"
+description = "MCP 2026-07-28 RC — conformance test runner"
+edition.workspace   = true
+version.workspace   = true
+authors.workspace   = true
+license.workspace   = true
+rust-version.workspace = true
+
+[[bin]]
+name = "longhaul-conformance"
+path = "src/main.rs"
+
+[dependencies]
+longhaul-core = { workspace = true }
+tokio         = { workspace = true }
+clap          = { workspace = true }
+reqwest       = { workspace = true }
+jsonschema    = { workspace = true }
+serde         = { workspace = true }
+serde_json    = { workspace = true }

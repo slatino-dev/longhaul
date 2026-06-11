@@ -1,0 +1,17 @@
+[package]
+name        = "indexer"
+description = "Example: index a local directory and expose it through longhaul-server"
+edition.workspace   = true
+version.workspace   = true
+authors.workspace   = true
+license.workspace   = true
+rust-version.workspace = true
+
+[[bin]]
+name = "indexer"
+path = "src/main.rs"
+
+[dependencies]
+longhaul-core   = { workspace = true }
+longhaul-server = { path = "../../longhaul-server" }
+tokio           = { workspace = true }
