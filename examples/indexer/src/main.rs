@@ -5,8 +5,10 @@
 //! * A **long-running tool** (`index_directory`) that spawns a background
 //!   tokio task and immediately returns a [`TaskHandleResult`] so the client
 //!   can track progress via `tasks/get` / `tasks/cancel`.
-//! * **Cancellation support**: the background worker checks a cancel token and
-//!   sets the task to `cancelled` in the store when it fires.
+//! * **Cancellation support**: a lightweight monitor task polls the store every
+//!   250 ms; when `tasks/cancel` sets the store status to `cancelled`, the
+//!   monitor fires the watch channel so `walk_and_index` aborts at the next
+//!   directory boundary and the worker records the final `cancelled` status.
 //! * **InputRequired round-trip**: when the supplied path matches multiple
 //!   sub-directories the tool pauses and asks the client which one to use. The
 //!   client retries with `inputResponses` + the echoed `requestState` token.
@@ -153,7 +155,6 @@ struct IndexDirectoryTool {
 /// chosen candidates so the retry knows what the server intended.
 #[derive(serde::Serialize, serde::Deserialize)]
 struct RequestStateToken {
-    task_id: String,
     candidates: Vec<PathBuf>,
 }
 
@@ -205,7 +206,6 @@ impl ToolHandler for IndexDirectoryTool {
             if candidates.len() > 1 {
                 // Pause for client input: which sub-directory to index?
                 let token = RequestStateToken {
-                    task_id: Uuid::new_v4().to_string(),
                     candidates: candidates.clone(),
                 };
                 let token_str = serde_json::to_string(&token).unwrap();
@@ -273,8 +273,29 @@ impl IndexDirectoryTool {
         let (cancel_tx, cancel_rx) = watch::channel(false);
         {
             let mut txs = self.state.cancel_txs.lock().unwrap();
-            txs.insert(task_id.clone(), cancel_tx);
+            txs.insert(task_id.clone(), cancel_tx.clone());
         }
+
+        // Monitor: polls the store every 250 ms. When tasks/cancel has set the
+        // store status to Cancelled this fires the watch channel so the
+        // walk_and_index loop aborts at the next directory boundary.
+        let monitor_store = Arc::clone(&self.state.store);
+        let monitor_task_id = task_id.clone();
+        let monitor_tx = cancel_tx;
+        tokio::spawn(async move {
+            loop {
+                tokio::time::sleep(std::time::Duration::from_millis(250)).await;
+                match monitor_store.get(&monitor_task_id) {
+                    Ok(t) if t.status == TaskStatus::Cancelled => {
+                        let _ = monitor_tx.send(true);
+                        break;
+                    }
+                    Ok(t) if t.status.is_terminal() => break, // completed/failed
+                    Err(_) => break,                           // task gone
+                    _ => {}
+                }
+            }
+        });
 
         let store = Arc::clone(&self.state.store);
         let cancel_txs = Arc::clone(&self.state.cancel_txs);

@@ -193,7 +193,7 @@ async fn run_discovery(client: &McpClient, schemas: &schema::Schemas) -> SuiteRe
         schemas.validate("discover_result", &v)
     }
     .await;
-    suite.record("discover_result_schema", result.clone());
+    suite.record("discover_result_schema", result);
 
     // 2. protocolVersion is exactly the RC string
     let result = async {
@@ -275,17 +275,13 @@ async fn run_tasks(client: &McpClient, _schemas: &schema::Schemas) -> SuiteResul
     let t0 = Instant::now();
     let mut suite = Suite::new("tasks");
 
-    // Pre-condition: the server must have a task we can manipulate. We use
-    // the conformance runner's own task injected via tasks/get on a
-    // freshly-created id; if tasks/get 404s the suite degrades gracefully.
-    //
-    // NOTE: longhaul-conformance tests against a *running server*. The server
-    // must be pre-seeded with at least one task OR the conformance tool must
-    // inject one. Since we can't call tools/call with a guaranteed long-running
-    // tool, we rely on the server's own store and test with a known injected
-    // task via the test harness (see `tests/conformance.rs` which starts an
-    // in-process server). When run against a remote server these task tests
-    // are best-effort; they'll skip gracefully if no task is injectable.
+    // The CLI suite covers error-code behaviour only: it generates a fresh UUID
+    // for each run so it never collides with live tasks, then verifies that
+    // well-formed requests for non-existent task ids return -32602 and that
+    // removed methods (tasks/list) return -32601. Full lifecycle coverage
+    // (working → inputRequired → working → completed) lives in the in-process
+    // suite at `tests/conformance.rs`, which boots a real server on a random
+    // port and pre-inserts tasks before exercising them.
 
     // Attempt to use a well-known test task id.
     let task_id = format!("conformance-{}", Uuid::new_v4());
